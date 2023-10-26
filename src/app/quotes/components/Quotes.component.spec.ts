@@ -1,7 +1,7 @@
 /* tslint:disable:no-unused-variable */
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import {  ComponentFixture, TestBed } from "@angular/core/testing";
 import { By } from "@angular/platform-browser";
-
+import 'jest-preset-angular';
 import { QuotesComponent } from "./Quotes.component";
 import { QuoteService } from "../service/Quote.service";
 import { QuoteModel } from "../model/QuoteModel";
@@ -70,7 +70,7 @@ describe("QuotesComponent", () => {
       new QuoteModel("I love unit testing", "Mon 4, 2018")
     ];
     const quoteService = fixture.debugElement.injector.get(QuoteService);
-    let spy = spyOn(quoteService, "fetchQuotesFromServer").and.returnValue(
+    let spy = jest.spyOn(quoteService, "fetchQuotesFromServer").mockReturnValue(
       Promise.resolve(fakedFetchedList)
     );
     fixture.detectChanges();
