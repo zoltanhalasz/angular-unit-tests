@@ -1,5 +1,5 @@
 /* tslint:disable:no-unused-variable */
-import {  ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { By } from "@angular/platform-browser";
 import 'jest-preset-angular';
 import { QuotesComponent } from "./Quotes.component";
@@ -10,15 +10,31 @@ import { FormsModule } from "@angular/forms";
 describe("QuotesComponent", () => {
   let component: QuotesComponent;
   let fixture: ComponentFixture<QuotesComponent>;
-
+  let fakedFetchedList: any[] = [];
+  let mockService = {
+    addNewQuote: jest.fn(),
+    getQuote: jest.fn(),
+    fetchQuotesFromServer: jest.fn(),
+    removeQuote: jest.fn(),
+  };
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [FormsModule],
-      declarations: [QuotesComponent]
+      declarations: [QuotesComponent],
+      providers: [{
+        provide: QuoteService, useValue: mockService
+      }]
     });
   });
 
   beforeEach(() => {
+
+    fakedFetchedList = [
+      new QuoteModel("I love unit testing", "Mon 4, 2018")
+    ];
+    mockService.fetchQuotesFromServer.mockReturnValue(
+      Promise.resolve(fakedFetchedList)
+    );
     fixture = TestBed.createComponent(QuotesComponent);
     component = fixture.debugElement.componentInstance;
   });
@@ -43,6 +59,7 @@ describe("QuotesComponent", () => {
   it("should disable the button when textArea is empty", () => {
     fixture.detectChanges();
     const button = fixture.debugElement.query(By.css("button"));
+    console.log(button.nativeElement.disabled)
     expect(button.nativeElement.disabled).toBeTruthy();
   });
 
@@ -66,13 +83,7 @@ describe("QuotesComponent", () => {
   });
 
   it("should fetch data asynchronously", async () => {
-    const fakedFetchedList = [
-      new QuoteModel("I love unit testing", "Mon 4, 2018")
-    ];
-    const quoteService = fixture.debugElement.injector.get(QuoteService);
-    let spy = jest.spyOn(quoteService, "fetchQuotesFromServer").mockReturnValue(
-      Promise.resolve(fakedFetchedList)
-    );
+
     fixture.detectChanges();
     fixture.whenStable().then(() => {
       expect(component.fetchedList).toBe(fakedFetchedList);
